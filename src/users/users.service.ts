@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -39,25 +41,42 @@ export class UsersService {
 
   findAll(role?: 'INTERN' | 'ENGINEER' | 'ADMIN') {
     if (role) {
-      return this.users.filter((user) => user.role === role);
-    } else {
-      return this.users;
+      const rolesArray = this.users.filter((user) => user.role === role);
+      if (rolesArray.length === 0) {
+        throw new NotFoundException('user role is not found');
+        
+      }
     }
+    return this.users;
   }
 
   findOne(id: number) {
-    if (id) {
-      return this.users.filter((user) => user.id === id);
+    const user = this.users.filter((user) => user.id === id);
+    if (!user) {
+      throw new NotFoundException('The user is not found');
     }
   }
 
-  create(user: {
-    name: string;
-    email: string;
-    role: 'INTERN' | 'ENGINEER' | 'ADMIN';
-  }) {
+  create(user: CreateUserDto) {
     const userByHighestId = [...this.users].sort((a, b) => b.id - a.id);
     const newUser = { id: userByHighestId[0].id + 1, ...user };
     this.users.push(newUser);
+    return newUser;
+  }
+
+  update(id: number, updatedUser: UpdateUserDto) {
+    this.users = this.users.map((user) => {
+      if (user.id === id) {
+        return { ...user, ...updatedUser };
+      }
+      return user;
+    });
+    return this.findOne(id);
+  }
+
+  delete(id: number) {
+    const removeUser = this.findOne(id);
+    this.users = this.users.filter((user) => user.id !== id);
+    return removeUser;
   }
 }
