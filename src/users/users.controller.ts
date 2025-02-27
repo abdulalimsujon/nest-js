@@ -1,9 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-empty-object-type */
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Body,
   Controller,
@@ -45,7 +39,7 @@ export class UsersController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe)
-  updateUserDto : UpdateUserDto
+    updateUserDto: UpdateUserDto,
   ) {
     return this.userService.update(id, updateUserDto);
   }
